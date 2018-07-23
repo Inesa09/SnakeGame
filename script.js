@@ -1,7 +1,7 @@
 const frame = document.getElementById("game");
 const snake = document.getElementsByClassName("snake")[0];
 let id;
-let coord = [0, 0];
+let coord = [0, 0]; // [x, y]
 
 
 const getPosition = (element) => {
@@ -16,13 +16,13 @@ const isTouched = (position1, position2) => {
     } return false;
 }
 
-const stopMove = () => {
+const stopMovement = () => {
     clearInterval(id);
 }
 
 const gameOver = () => {
     if (isTouched(getPosition(frame), getPosition(snake))) {
-        stopMove();
+        stopMovement();
         // alert("Game Over!");
     }
 }
@@ -33,52 +33,40 @@ const decrement = (val) => --val;
 const move = (side, func) => {
     snake.style.transform = "translate(" + coord[0] + "px," + coord[1] + "px)";
     coord[side] = func(coord[side]);
-    // console.log(coord[side]);
-    console.log("x: " + coord[0] + ", y: " + coord[1]);
-    // console.log("frame - " + getPosition(frame) + " snake - " + getPosition(snake));
-    // console.log(snake.style.transform);
-    // if (increment)
-    //     side++;
-    // else
-    //     side--;
     gameOver();
+}
+
+const startInterval = (side, func) => {
+    id = setInterval(move, 5, side, func);
 }
 
 const moveToDirection = (direction) => {
     switch(direction){
         case("Left"):
-            id = setInterval(move, 5, 0, decrement);
+            startInterval(0, decrement);
             break;
         case("Right"):
-            id = setInterval(move, 5, 0, increment);
+            startInterval(0, increment);
             break;
         case("Up"):
-            id = setInterval(move, 5, 1, decrement);
+            startInterval(1, decrement);
             break;
         case("Down"):
-            id = setInterval(move, 5, 1, increment);
+            startInterval(1, increment);
             break;
-
     }
-
-    // if (direction === "Left" || direction === "Right")
-    //     side = x;
-    // else 
-    //     side = y;
-    // if (direction === "Right" || direction === "Down")
-    //     increment = true;
-
-    // id = setInterval(move, 5, side, increment);
 }
 
-
+const readyForMovement = () => {
+    document.addEventListener("keydown", function(event) { //"ArrowLeft"
+        if (event.keyCode >= 37 && event.keyCode <= 40)
+            stopMovement();
+        moveToDirection(event.key.slice(5));
+    });
+}
 
 const play = () => {
     document.getElementById("play").style.display = "none";
     frame.style.display = "block";
-
-    document.addEventListener("keydown", function(event) { //"ArrowLeft"
-        stopMove();
-        moveToDirection(event.key.slice(5));
-    });
+    readyForMovement();
 }
